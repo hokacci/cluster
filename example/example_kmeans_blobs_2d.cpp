@@ -8,20 +8,18 @@
 
 int main()
 {
-	std::vector<Point2D> points = dataset_blobs_2d;
+	yhok::cluster::KMeans kmeans(3, 100, dataset_blobs_2d);
 
-	std::vector<int> labels;
-	std::vector<Point2D> centroids;
-	yhok::cluster::exec_kmeans(points, 3, 100, labels, centroids);
+	kmeans.exec();
 
-	std::vector<double> x(points.size());
-	std::vector<double> y(points.size());
-	std::vector<double> c(points.size());
-	for (int i = 0; i < points.size(); ++i)
+	std::vector<double> x(kmeans.m);
+	std::vector<double> y(kmeans.m);
+	std::vector<double> c(kmeans.m);
+	for (int i = 0; i < kmeans.m; ++i)
 	{
-		x[i] = points[i].x;
-		y[i] = points[i].y;
-		c[i] = static_cast<double>(labels[i]);
+		x[i] = kmeans.points[i].x;
+		y[i] = kmeans.points[i].y;
+		c[i] = static_cast<double>(kmeans.labels[i]);
 	}
 
 	auto l = matplot::scatter(x, y, std::vector<double>{}, c);
@@ -29,12 +27,12 @@ int main()
 	l->marker_size(8);
 	matplot::hold(matplot::on);
 
-	std::vector<double> cx(centroids.size());
-	std::vector<double> cy(centroids.size());
-	for (int i = 0; i < centroids.size(); ++i)
+	std::vector<double> cx(kmeans.k);
+	std::vector<double> cy(kmeans.k);
+	for (int i = 0; i < kmeans.k; ++i)
 	{
-		cx[i] = centroids[i].x;
-		cy[i] = centroids[i].y;
+		cx[i] = kmeans.centroids[i].x;
+		cy[i] = kmeans.centroids[i].y;
 	}
 
 	auto cl = matplot::scatter(cx, cy, 30);
