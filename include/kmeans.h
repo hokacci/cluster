@@ -37,10 +37,16 @@ namespace yhok::cluster
 		void exec()
 		{
 			init_centroids();
+			update_labels();
+
 			for (int i = 0; i < max_iter; ++i)
 			{
-				update_labels();
 				update_centroids();
+				bool updated = update_labels();
+				if (!updated)
+				{
+					break;
+				}
 			}
 		}
 
@@ -50,7 +56,7 @@ namespace yhok::cluster
 		{
 			std::random_device seed_gen;
 			std::mt19937 engine(seed_gen());
-			std::uniform_int_distribution<> dist(0, points.size() - 1);
+			std::uniform_int_distribution<> dist(0, m - 1);
 
 			for (auto &&centroid : centroids)
 			{
@@ -59,21 +65,30 @@ namespace yhok::cluster
 		}
 
 		// 各点を最も近いセントロイドに割り当てる
-		void update_labels()
+		// 割り当てが変わった場合はtrueを返す
+		bool update_labels()
 		{
+			bool updated = false;
 			for (int i = 0; i < m; ++i)
 			{
 				double min_dist = std::numeric_limits<double>::max();
+				int min_label = -1;
 				for (int j = 0; j < k; ++j)
 				{
 					double dist = distance(points[i], centroids[j]);
 					if (dist < min_dist)
 					{
 						min_dist = dist;
-						labels[i] = j;
+						min_label = j;
 					}
 				}
+				if (labels[i] != min_label)
+				{
+					updated = true;
+					labels[i] = min_label;
+				}
 			}
+			return updated;
 		}
 
 		// 各クラスタの重心を計算して、セントロイドを更新する
