@@ -50,17 +50,61 @@ namespace yhok::cluster
 			}
 		}
 
+		void exec_kmeans_plus_plus()
+		{
+			init_centroids_kmeans_plus_plus();
+			update_labels();
+
+			for (int i = 0; i < max_iter; ++i)
+			{
+				update_centroids();
+				bool updated = update_labels();
+				if (!updated)
+				{
+					break;
+				}
+			}
+		}
+
 		// セントロイドを初期化
 		// pointsからランダムにk個の点を選ぶ
 		void init_centroids()
 		{
 			std::random_device seed_gen;
 			std::mt19937 engine(seed_gen());
-			std::uniform_int_distribution<> dist(0, m - 1);
+			std::uniform_int_distribution<> distribution(0, m - 1);
 
 			for (auto &&centroid : centroids)
 			{
-				centroid = points[dist(engine)];
+				centroid = points[distribution(engine)];
+			}
+		}
+
+		// K-means++法を用いてセントロイドを初期化
+		void init_centroids_kmeans_plus_plus()
+		{
+			std::random_device seed_gen;
+			std::mt19937 engine(seed_gen());
+			std::uniform_int_distribution<> uniform_distribution(0, m - 1);
+
+			// 最初のセントロイドはランダムに選ぶ
+			centroids[0] = points[uniform_distribution(engine)];
+
+			// 残りのセントロイドは、それまでのセントロイドとの距離が遠い点が選ばれやすいような確率分布を使って選ぶ
+			for (int i = 1; i < k; ++i)
+			{
+				std::vector<double> dists(m);
+				for (int j = 0; j < m; ++j)
+				{
+					double min_dist = std::numeric_limits<double>::max();
+					for (int l = 0; l < i; ++l)
+					{
+						min_dist = std::min(min_dist, distance(points[j], centroids[l]));
+					}
+					dists[j] = min_dist;
+				}
+				std::discrete_distribution<> distance_based_distribution(dists.begin(), dists.end());
+				centroids[i] = points[distance_based_distribution(engine)];
 			}
 		}
 
