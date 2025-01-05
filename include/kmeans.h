@@ -93,7 +93,7 @@ namespace yhok::cluster
 			// 残りのセントロイドは、それまでのセントロイドとの距離が遠い点が選ばれやすいような確率分布を使って選ぶ
 			for (int i = 1; i < k; ++i)
 			{
-				std::vector<double> dists(m);
+				std::vector<double> dist2s(m);
 				for (int j = 0; j < m; ++j)
 				{
 					double min_dist = std::numeric_limits<double>::max();
@@ -101,9 +101,9 @@ namespace yhok::cluster
 					{
 						min_dist = std::min(min_dist, distance(points[j], centroids[l]));
 					}
-					dists[j] = min_dist;
+					dist2s[j] = min_dist * min_dist;
 				}
-				std::discrete_distribution<> distance_based_distribution(dists.begin(), dists.end());
+				std::discrete_distribution<> distance_based_distribution(dist2s.begin(), dist2s.end());
 				centroids[i] = points[distance_based_distribution(engine)];
 			}
 		}
