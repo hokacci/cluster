@@ -107,9 +107,9 @@ namespace yhok::cluster
 			// 最初のセントロイドはランダムに選ぶ
 			int index = uniform_distribution(engine);
 			centroids[0] = points[index];
-			std::vector<int> used_indices = {index};
 
 			// 残りのセントロイドは、それまでのセントロイドとの距離が遠い点が選ばれやすいような確率分布を使って選ぶ
+			// この場合、重複を考慮する必要はない (すでに選ばれたセントロイドは選ばれる確率が0となるため)
 			for (int i = 1; i < k; ++i)
 			{
 				std::vector<double> dist2s(m);
@@ -124,14 +124,8 @@ namespace yhok::cluster
 				}
 				std::discrete_distribution<> distance_based_distribution(dist2s.begin(), dist2s.end());
 
-				// 重複しないようにindexを選ぶ
-				do
-				{
-					index = distance_based_distribution(engine);
-				} while (std::find(used_indices.begin(), used_indices.end(), index) != used_indices.end());
-
+				index = distance_based_distribution(engine);
 				centroids[i] = points[index];
-				used_indices.push_back(index);
 			}
 		}
 
