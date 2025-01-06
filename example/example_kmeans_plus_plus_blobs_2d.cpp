@@ -7,7 +7,7 @@
 int main()
 {
 	yhok::cluster::KMeans kmeans(3, 100, dataset_blobs_2d);
-	int n = 10000000;
+	int n = 100000;
 
 	// k-meansをn回実行して、失敗する回数を数える
 	int count_failure = 0;
