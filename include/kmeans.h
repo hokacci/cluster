@@ -29,6 +29,9 @@ namespace yhok::cluster
 		std::vector<int> labels;
 		std::vector<Point> centroids;
 
+		// sum of squared estimate of errors
+		double sse = 0;
+
 		KMeans(int k, int max_iter, const std::vector<Point> &points)
 			: k(k), max_iter(max_iter), points(points), m(points.size()), labels(m), centroids(k)
 		{
@@ -130,10 +133,12 @@ namespace yhok::cluster
 		}
 
 		// 各点を最も近いセントロイドに割り当てる
+		// SSEを更新する
 		// 割り当てが変わった場合はtrueを返す
 		bool update_labels()
 		{
 			bool updated = false;
+			sse = 0;
 			for (int i = 0; i < m; ++i)
 			{
 				double min_dist = std::numeric_limits<double>::max();
@@ -152,6 +157,7 @@ namespace yhok::cluster
 					updated = true;
 					labels[i] = min_label;
 				}
+				sse += min_dist * min_dist;
 			}
 			return updated;
 		}
