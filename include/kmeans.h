@@ -35,12 +35,14 @@ namespace yhok::cluster
 		}
 
 		// K-means法を実行する
-		void exec()
+		// 返り値はイテレーション回数
+		int exec()
 		{
 			init_centroids();
 			update_labels();
 
-			for (int i = 0; i < max_iter; ++i)
+			int i = 0;
+			for (; i < max_iter; ++i)
 			{
 				update_centroids();
 				bool updated = update_labels();
@@ -49,14 +51,18 @@ namespace yhok::cluster
 					break;
 				}
 			}
+			return i;
 		}
 
-		void exec_kmeans_plus_plus()
+		// k-means++を実行する
+		// 返り値はイテレーション回数
+		int exec_kmeans_plus_plus()
 		{
 			init_centroids_kmeans_plus_plus();
 			update_labels();
 
-			for (int i = 0; i < max_iter; ++i)
+			int i = 0;
+			for (; i < max_iter; ++i)
 			{
 				update_centroids();
 				bool updated = update_labels();
@@ -65,6 +71,7 @@ namespace yhok::cluster
 					break;
 				}
 			}
+			return i;
 		}
 
 		// セントロイドを初期化
