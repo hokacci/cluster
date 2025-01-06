@@ -74,9 +74,18 @@ namespace yhok::cluster
 			std::mt19937 engine(seed_gen());
 			std::uniform_int_distribution<> distribution(0, m - 1);
 
+			std::vector<int> used_indices;
 			for (auto &&centroid : centroids)
 			{
-				centroid = points[distribution(engine)];
+				// 重複しないようにindexを選ぶ
+				int index;
+				do
+				{
+					index = distribution(engine);
+				} while (std::find(used_indices.begin(), used_indices.end(), index) != used_indices.end());
+
+				centroid = points[index];
+				used_indices.push_back(index);
 			}
 		}
 
@@ -88,7 +97,9 @@ namespace yhok::cluster
 			std::uniform_int_distribution<> uniform_distribution(0, m - 1);
 
 			// 最初のセントロイドはランダムに選ぶ
-			centroids[0] = points[uniform_distribution(engine)];
+			int index = uniform_distribution(engine);
+			centroids[0] = points[index];
+			std::vector<int> used_indices = {index};
 
 			// 残りのセントロイドは、それまでのセントロイドとの距離が遠い点が選ばれやすいような確率分布を使って選ぶ
 			for (int i = 1; i < k; ++i)
@@ -104,7 +115,15 @@ namespace yhok::cluster
 					dist2s[j] = min_dist * min_dist;
 				}
 				std::discrete_distribution<> distance_based_distribution(dist2s.begin(), dist2s.end());
-				centroids[i] = points[distance_based_distribution(engine)];
+
+				// 重複しないようにindexを選ぶ
+				do
+				{
+					index = distance_based_distribution(engine);
+				} while (std::find(used_indices.begin(), used_indices.end(), index) != used_indices.end());
+
+				centroids[i] = points[index];
+				used_indices.push_back(index);
 			}
 		}
 
