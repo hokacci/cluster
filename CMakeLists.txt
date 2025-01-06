@@ -26,6 +26,8 @@ if(NOT matplotplusplus_POPULATED)
     add_subdirectory(${matplotplusplus_SOURCE_DIR} ${matplotplusplus_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
+# Example: K-means on 2D blobs
+
 add_executable(example_kmeans_blobs_2d
     example/example_kmeans_blobs_2d.cpp
     example/helpers/src/point_2d.cpp
@@ -40,4 +42,21 @@ target_link_libraries(example_kmeans_blobs_2d
     lib_yhok_cluster
     PUBLIC
     matplot
+)
+
+# Example: K-means++ on 2D blobs
+
+add_executable(example_kmeans_plus_plus_blobs_2d
+    example/example_kmeans_plus_plus_blobs_2d.cpp
+    example/helpers/src/point_2d.cpp
+    example/helpers/src/blobs_2d.cpp
+)
+
+target_include_directories(example_kmeans_plus_plus_blobs_2d PRIVATE
+    example/helpers/include
+)
+
+target_link_libraries(example_kmeans_plus_plus_blobs_2d
+    PRIVATE
+    lib_yhok_cluster
 )
