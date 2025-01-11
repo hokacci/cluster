@@ -17,7 +17,11 @@ int main()
 		sses[k - 1] = kmeans->sse;
 		ks[k - 1] = k;
 	}
-	matplot::plot(sses);
+	auto p = matplot::plot(sses);
+	p->line_width(5);
+	p->marker_style(matplot::line_spec::marker_style::circle);
+	p->marker_size(10);
+	p->marker_face(true);
 	matplot::title("Elbow Method");
 	matplot::show();
 
