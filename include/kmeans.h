@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <concepts>
+#include <memory>
 #include <random>
 #include <vector>
 
@@ -178,5 +179,28 @@ namespace yhok::cluster
 			}
 		}
 	};
+
+	// k-means++をn回実行し、SSEが最良のものを返す
+	template <KMeansablePoint Point>
+	std::unique_ptr<KMeans<Point>> kmeans_plus_plus_multi(int n, int k, int max_iter, const std::vector<Point> &points)
+	{
+		// 最良のk-means法の結果を格納する変数
+		auto kmeans_opt = std::make_unique<KMeans<Point>>(k, max_iter, points);
+		kmeans_opt->sse = std::numeric_limits<double>::max();
+
+		// k-means法を実行する変数
+		auto kmeans_exc = std::make_unique<KMeans<Point>>(k, max_iter, points);
+
+		for (int i = 0; i < n; ++i)
+		{
+			kmeans_exc->exec_kmeans_plus_plus();
+			if (kmeans_exc->sse < kmeans_opt->sse)
+			{
+				kmeans_opt.swap(kmeans_exc);
+			}
+		}
+
+		return kmeans_opt;
+	}
 
 } // namespace yhok::cluster
